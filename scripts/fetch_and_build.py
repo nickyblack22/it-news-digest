@@ -87,20 +87,20 @@ Format JSON ที่ต้องการ:
   }}
 ]"""
 
-    response = client.models.generate_content(
-    model="gemini-2.0-flash",
-    contents=prompt
-)
-text = response.text.strip()
+response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
+        text = response.text.strip()
 
-    # ลบ markdown backticks ถ้ามี
-    if text.startswith("```"):
-        text = text.split("```")[1]
-        if text.startswith("json"):
-            text = text[4:]
-    text = text.strip()
+        # ลบ markdown backticks ถ้ามี
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"):
+                text = text[4:]
+        text = text.strip()
 
-    return json.loads(text)
+        return json.loads(text)
 
 # ─── Step 3: สร้าง HTML ────────────────────────────────────
 def build_html(articles, date_str, display_date):
