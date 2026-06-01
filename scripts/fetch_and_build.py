@@ -18,7 +18,7 @@ RSS_FEEDS = {
     "Siamphone":     "https://www.siamphone.com/feed/",
 }
 
-MAX_PER_FEED = 10  # ดึงสูงสุด 10 ข่าวต่อเว็บ
+MAX_PER_FEED = 10
 
 # ─── Gemini Setup ──────────────────────────────────────────
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
@@ -34,7 +34,6 @@ def fetch_news():
         for entry in feed.entries:
             if count >= MAX_PER_FEED:
                 break
-            # กรองเฉพาะข่าวใน 24 ชม. (ถ้า feed มี published date)
             if hasattr(entry, 'published_parsed') and entry.published_parsed:
                 pub = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
                 if pub < cutoff:
@@ -87,20 +86,19 @@ Format JSON ที่ต้องการ:
   }}
 ]"""
 
-response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
-        )
-        text = response.text.strip()
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt
+    )
+    text = response.text.strip()
 
-        # ลบ markdown backticks ถ้ามี
-        if text.startswith("```"):
-            text = text.split("```")[1]
-            if text.startswith("json"):
-                text = text[4:]
-        text = text.strip()
+    if text.startswith("```"):
+        text = text.split("```")[1]
+        if text.startswith("json"):
+            text = text[4:]
+    text = text.strip()
 
-        return json.loads(text)
+    return json.loads(text)
 
 # ─── Step 3: สร้าง HTML ────────────────────────────────────
 def build_html(articles, date_str, display_date):
@@ -116,7 +114,6 @@ def build_html(articles, date_str, display_date):
 
     for art in articles:
         color = category_colors.get(art.get("category", "Other"), "#6b7280")
-        sources_html = " · ".join(art.get("sources", []))
         links = art.get("links", [])
         link_html = ""
         for i, src in enumerate(art.get("sources", [])):
@@ -213,18 +210,12 @@ def main():
     print("🏗 สร้าง HTML...")
     html = build_html(articles, TODAY, DISPLAY_DATE)
 
-    # บันทึกหน้าวันนี้
     with open(f"docs/{TODAY}.html", "w", encoding="utf-8") as f:
         f.write(html)
 
-    # อัปเดต index.html (หน้าหลัก)
     with open("docs/index.html", "w", encoding="utf-8") as f:
         f.write(html)
 
-    # อัปเดต archive
     update_archive(TODAY, DISPLAY_DATE, len(articles))
 
-    print(f"✅ เสร็จแล้ว — {len(articles)} ข่าว → docs/{TODAY}.html")
-
-if __name__ == "__main__":
-    main()
+    print(f"✅ เสร็จแล้ว — {len(articles
