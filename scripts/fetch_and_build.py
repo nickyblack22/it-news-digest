@@ -26,7 +26,6 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 # ─── Step 1: ดึงข่าวจาก RSS ────────────────────────────────
 def fetch_news():
     all_news = []
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=72)
 
     for source, url in RSS_FEEDS.items():
         feed = feedparser.parse(url)
@@ -34,10 +33,6 @@ def fetch_news():
         for entry in feed.entries:
             if count >= MAX_PER_FEED:
                 break
-            if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                pub = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
-                if pub < cutoff:
-                    continue
             title = entry.get("title", "").strip()
             summary = entry.get("summary", "")[:300].strip()
             link = entry.get("link", "")
