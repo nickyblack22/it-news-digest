@@ -26,7 +26,7 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 # ─── Step 1: ดึงข่าวจาก RSS ────────────────────────────────
 def fetch_news():
     all_news = []
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=72)
 
     for source, url in RSS_FEEDS.items():
         feed = feedparser.parse(url)
