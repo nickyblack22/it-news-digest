@@ -218,4 +218,4 @@ def main():
 
     update_archive(TODAY, DISPLAY_DATE, len(articles))
 
-    print(f"✅ เสร็จแล้ว — {len(articles
+    print(f"Done: {len(articles)} articles saved to docs/{TODAY}.html")
