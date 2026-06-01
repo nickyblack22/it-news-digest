@@ -1,5 +1,5 @@
 import feedparser
-import google.generativeai as genai
+from google import genai
 import os
 import json
 from datetime import datetime, timezone, timedelta
@@ -21,8 +21,7 @@ RSS_FEEDS = {
 MAX_PER_FEED = 10  # ดึงสูงสุด 10 ข่าวต่อเว็บ
 
 # ─── Gemini Setup ──────────────────────────────────────────
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 # ─── Step 1: ดึงข่าวจาก RSS ────────────────────────────────
 def fetch_news():
@@ -88,8 +87,11 @@ Format JSON ที่ต้องการ:
   }}
 ]"""
 
-    response = model.generate_content(prompt)
-    text = response.text.strip()
+    response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=prompt
+)
+text = response.text.strip()
 
     # ลบ markdown backticks ถ้ามี
     if text.startswith("```"):
